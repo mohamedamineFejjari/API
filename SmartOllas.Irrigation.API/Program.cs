@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,9 +48,9 @@ app.MapPut("/plante/{id}", (Plante updatedPlante, int id) =>
     if (plante is null)
         return Results.NotFound("sorry,this plante doesn't exist");
 
-    plante.type = updatedPlante.type;
+    plante.ClayJarId = updatedPlante.ClayJarId;
 
-    return Results.OK(plante);
+    return Results.Ok(plante);
 });
 app.MapDelete("/plante/{id}", (int id) =>
 {
@@ -57,8 +58,8 @@ app.MapDelete("/plante/{id}", (int id) =>
     if (plante is null)
         return Results.NotFound("sorry,this plante doesn't exist");
     plantes.Remove(plante);
+    return Results.Ok(plante);
 });
-
 
 var summaries = new[]
 {
@@ -68,15 +69,15 @@ var summaries = new[]
 app.MapGet("/weatherforecast", () =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
+            new WeatherForecast
+            (
+                DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                Random.Shared.Next(-20, 55),
+                summaries[Random.Shared.Next(summaries.Length)]
+            ))
         .ToArray();
     return forecast;
-})
+});
 var capteurs = new List<Capteur>{
     new Capteur {id = 1 , ValeurHmidity  =19,ValeurTemperature = 27 , ClayJarId=1, PlanteId=1},
     new Capteur{id = 2 , ValeurHmidity  =20,ValeurTemperature =  39  , ClayJarId=2, PlanteId=2},
@@ -96,7 +97,7 @@ app.MapGet("/Capteur/{id:int}", (int id) =>
 });
 app.MapPost("/Capteur", (Capteur capteur) =>
 {
-    capteurs.Add(Capteur);
+    capteurs.Add(capteur);
     return capteurs;
 });
 app.MapPut("/Capteur/{id}", (Capteur updatedCapteur, int id) =>
@@ -107,7 +108,7 @@ app.MapPut("/Capteur/{id}", (Capteur updatedCapteur, int id) =>
 
     Capteur.id = updatedCapteur.id;
 
-    return Results.OK(Capteur);
+    return Results.Ok(Capteur);
 });
 app.MapDelete("/Capteur/{id}", (int id) =>
 {
@@ -115,6 +116,7 @@ app.MapDelete("/Capteur/{id}", (int id) =>
     if (Capteur is null)
         return Results.NotFound("sorry,this sensor doesn't exist");
     capteurs.Remove(Capteur);
+    return Results.Ok(Capteur);
 });
 
 var jarres = new List<Jarre>{
@@ -137,7 +139,7 @@ app.MapGet("/Jarre/{id:int}", (int id) =>
 });
 app.MapPost("/Jarre", (Jarre jarre) =>
 {
-    jarres.Add(Jarre);
+    jarres.Add(jarre);
     return jarres;
 });
 app.MapPut("/Jarre/{id}", (Jarre updatedJarre, int id) =>
@@ -148,7 +150,7 @@ app.MapPut("/Jarre/{id}", (Jarre updatedJarre, int id) =>
 
     Jarre.id = updatedJarre.id;
 
-    return Results.OK(Jarre);
+    return Results.Ok(Jarre);
 });
 app.MapDelete("/Jarre/{id}", (int id) =>
 {
@@ -156,6 +158,7 @@ app.MapDelete("/Jarre/{id}", (int id) =>
     if (Jarre is null)
         return Results.NotFound("sorry,this Jarre doesn't exist");
     jarres.Remove(Jarre);
+    return Results.Ok(Jarre);
 });
 
 var utilisateurs = new List<Utilisateur>{
@@ -177,7 +180,7 @@ app.MapGet("/Utilisateur/{id:int}", (int id) =>
 });
 app.MapPost("/Utilisateur", (Utilisateur utilisateur) =>
 {
-    utilisateurs.Add(Utilisateur);
+    utilisateurs.Add(utilisateur);
     return utilisateurs;
 });
 
@@ -187,9 +190,9 @@ app.MapPut("/Utilisateur/{id}", (Utilisateur utilisateur, int id) =>
     if (Utilisateur is null)
         return Results.NotFound("sorry,this utilisateur doesn't exist");
 
-    Utilisateur.id = updatedUtilisateur.id;
+    Utilisateur.id = utilisateur.id;
 
-    return Results.OK(Utilisateur);
+    return Results.Ok(Utilisateur);
 });
 app.MapDelete("/Utilisateur/{id}", (int id) =>
 {
@@ -197,58 +200,47 @@ app.MapDelete("/Utilisateur/{id}", (int id) =>
     if (Utilisateur is null)
         return Results.NotFound("sorry,this utilisateur doesn't exist");
     utilisateurs.Remove(Utilisateur);
-});
+    return Results.Ok(Utilisateur);
+})
 
-
-.WithName("GetWeatherForecast")
+.WithName("DeleteUtilisateur")
 .WithOpenApi();
-
 
 app.Run();
 
-class Plante
+internal class Plante
 {
     public int id { get; set; }
-    public required string Name { get; set; }
-    public required string Variety { get; set; }
-    public required int WaterNeeded { get; set; }
-    public required int ClayJarId { get; set; }
-    public required int SensorId { get; set; }
-
-
-
-
+    public string Name { get; set; }
+    public string Variety { get; set; }
+    public int WaterNeeded { get; set; }
+    public int ClayJarId { get; set; }
+    public int SensorId { get; set; }
 }
-class Capteur
+
+internal class Capteur
 {
     public int id { get; set; }
-    public required int ValeurHmidity { get; set; }
-    public required int ValeurTemperature { get; set; }
-    public required int ClayJarId { get; set; }
-    public required int PlanteId { get; set; }
-
-
-
-
+    public int ValeurHmidity { get; set; }
+    public int ValeurTemperature { get; set; }
+    public int ClayJarId { get; set; }
+    public int PlanteId { get; set; }
 }
-class Jarre
+
+internal class Jarre
 {
     public int id { get; set; }
-    public required int Volume { get; set; }
-    public required int PlanteId { get; set; }
-    public required int SensorId { get; set; }
+    public int Volume { get; set; }
+    public int PlanteId { get; set; }
+    public int SensorId { get; set; }
 }
-class Utilisateur
+
+internal class Utilisateur
 {
     public int id { get; set; }
-    public required string Name { get; set; }
-    public required int age { get; set; }
-
-
-
-
+    public string Name { get; set; }
+    public int age { get; set; }
 }
-
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
