@@ -1,5 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-using System.Numerics;
+using SmartOllas.Irrigation.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +18,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var plantes = new List<Plante>{
-    new Plante {id = 1 , Name  ="olivier",Variety = "V1" , WaterNeeded=43, ClayJarId=1, SensorId=1},
-    new Plante{id = 2 , Name  ="orange",Variety = "V2" , WaterNeeded=78, ClayJarId=2, SensorId=2},
-    new Plante{id = 3 , Name  ="citron",Variety = "V3" , WaterNeeded=57, ClayJarId=3, SensorId=3},
-    new Plante{id = 4 , Name  ="pomme",Variety = "V4" , WaterNeeded=45, ClayJarId=4, SensorId=4},
+var plantes = new List<PlanteViewModel>{
+    new PlanteViewModel {id = 1 , Name  ="olivier",Variety = "V1" , WaterNeeded=43, ClayJarId=1, SensorId=1},
+    new PlanteViewModel{id = 2 , Name  ="orange",Variety = "V2" , WaterNeeded=78, ClayJarId=2, SensorId=2},
+    new PlanteViewModel{id = 3 , Name  ="citron",Variety = "V3" , WaterNeeded=57, ClayJarId=3, SensorId=3},
+    new PlanteViewModel{id = 4 , Name  ="pomme",Variety = "V4" , WaterNeeded=45, ClayJarId=4, SensorId=4},
 };
 
 app.MapGet("/plante", () =>
@@ -37,12 +36,8 @@ app.MapGet("/plante/{id:int}", (int id) =>
         return Results.NotFound("sorry, this plante doesn't exist");
     return Results.Ok(plante);
 });
-app.MapPost("/plante", (Plante plante) =>
-{
-    plantes.Add(plante);
-    return plantes;
-});
-app.MapPut("/plante/{id}", (Plante updatedPlante, int id) =>
+
+app.MapPut("/plante/{id}", (PlanteViewModel updatedPlante, int id) =>
 {
     var plante = plantes.Find(p => p.id == id);
     if (plante is null)
@@ -195,54 +190,57 @@ app.MapPut("/Utilisateur/{id}", (Utilisateur utilisateur, int id) =>
     return Results.Ok(Utilisateur);
 });
 app.MapDelete("/Utilisateur/{id}", (int id) =>
-{
-    var Utilisateur = utilisateurs.Find(u => u.id == id);
-    if (Utilisateur is null)
-        return Results.NotFound("sorry,this utilisateur doesn't exist");
-    utilisateurs.Remove(Utilisateur);
-    return Results.Ok(Utilisateur);
-})
+    {
+        var Utilisateur = utilisateurs.Find(u => u.id == id);
+        if (Utilisateur is null)
+            return Results.NotFound("sorry,this utilisateur doesn't exist");
+        utilisateurs.Remove(Utilisateur);
+        return Results.Ok(Utilisateur);
+    })
 
-.WithName("DeleteUtilisateur")
-.WithOpenApi();
+    .WithName("DeleteUtilisateur")
+    .WithOpenApi();
 
 app.Run();
 
-internal class Plante
+namespace SmartOllas.Irrigation.API
 {
-    public int id { get; set; }
-    public string Name { get; set; }
-    public string Variety { get; set; }
-    public int WaterNeeded { get; set; }
-    public int ClayJarId { get; set; }
-    public int SensorId { get; set; }
-}
+    internal class PlanteViewModel
+    {
+        public int id { get; set; }
+        public string Name { get; set; }
+        public string Variety { get; set; }
+        public int WaterNeeded { get; set; }
+        public int ClayJarId { get; set; }
+        public int SensorId { get; set; }
+    }
 
-internal class Capteur
-{
-    public int id { get; set; }
-    public int ValeurHmidity { get; set; }
-    public int ValeurTemperature { get; set; }
-    public int ClayJarId { get; set; }
-    public int PlanteId { get; set; }
-}
+    internal class Capteur
+    {
+        public int id { get; set; }
+        public int ValeurHmidity { get; set; }
+        public int ValeurTemperature { get; set; }
+        public int ClayJarId { get; set; }
+        public int PlanteId { get; set; }
+    }
 
-internal class Jarre
-{
-    public int id { get; set; }
-    public int Volume { get; set; }
-    public int PlanteId { get; set; }
-    public int SensorId { get; set; }
-}
+    internal class Jarre
+    {
+        public int id { get; set; }
+        public int Volume { get; set; }
+        public int PlanteId { get; set; }
+        public int SensorId { get; set; }
+    }
 
-internal class Utilisateur
-{
-    public int id { get; set; }
-    public string Name { get; set; }
-    public int age { get; set; }
-}
+    internal class Utilisateur
+    {
+        public int id { get; set; }
+        public string Name { get; set; }
+        public int age { get; set; }
+    }
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+    {
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
 }
